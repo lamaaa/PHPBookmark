@@ -49,7 +49,7 @@
         
         if(!$result)
         {
-            throw new Exception('Could not log you in.');
+            throw new Exception('Invalid password.');
         }
         
         if($result->num_rows > 0)

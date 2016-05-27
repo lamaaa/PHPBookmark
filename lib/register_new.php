@@ -7,10 +7,11 @@
     $username = $_POST['username'];
     $passwd = $_POST['passwd'];
     $passwd2 = $_POST['passwd2'];
-    
+    $enter_vcode = $_POST['veritycode'];
     // start session which may be needed later
     // start it now because it must go before headers 
     session_start();
+    $vcode = $_SESSION['VCODE'];
     try
     {
         // check forms filled in 
@@ -18,6 +19,11 @@
             throw new Exception('You have not filled the form out correctly -
                 Please go back and try again.');
         // email address not valid
+        
+        if($vcode != $enter_vcode)
+        {
+            throw new Exception('Please enter correct verify code');
+        }
         
         if(!valid_email($email))
         {

@@ -6,12 +6,19 @@
     // create short variable names 
     @$username = $_POST['username'];
     @$passwd = $_POST['passwd'];
+    @$vcode = $_SESSION['VCODE'];
+    @$enter_vcode = $_POST['veriftycode'];
     
     if($username && $passwd)
     {
         // they have just tried logging in 
         try
         {
+            if($vcode != $enter_vcode)
+            {
+                throw new Exception('Please enter correct verifty code.');
+            }
+            
             login($username, $passwd);
             // if they are in the database register the user id 
             $_SESSION['valid_user'] = $username;
@@ -20,8 +27,7 @@
         {
             // unsuccessful login
             do_html_header('Problem:');
-            echo 'You could not be logged in. 
-                You must be logged in to view this page.';
+            echo $e->getMessage();
             do_html_url('login.php', 'Login');
             do_html_footer();
             exit;

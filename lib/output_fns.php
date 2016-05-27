@@ -98,6 +98,10 @@ function display_login_form()
 				<td><input type="password" name="passwd"/></td>
 			</tr>
 			<tr>
+				<td><img src="verifycode.php"width="130" height="25"/></td>
+				<td><input type="text" name="veriftycode" placeholder="Enter verifycode" maxlength="6" /></td>
+			</tr>
+			<tr>
 				<td colspan="2" align="center">
 					<input type="submit" value="Log in"/>
 				</td>
@@ -114,7 +118,7 @@ function display_registration_form()
 {
 ?>
 	<form method="post"	action="register_new.php">
-		<table bgcolor="#cccccc">
+		<table bgcolor="#cccccc" border="0">
 			<tr>
 				<td>Email address:</td>
 				<td><input type="text" name="email" size="30"
@@ -138,6 +142,10 @@ function display_registration_form()
 					<input type="password" name="passwd2" size="16"
 					maxlength="16"/>
 				</td>
+			</tr>
+			<tr>
+				<td><img src="verifycode.php"width="130" height="25"/></td>
+				<td><input type="text" name="veritycode" placeholder="Enter verifycode" size="16" maxlength="6" /></td>
 			</tr>
 			<tr>
 				<td colspan="2" align="center">
