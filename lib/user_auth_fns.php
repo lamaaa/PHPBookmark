@@ -21,6 +21,16 @@
         {
             throw new Exception('That username is taken - go back and choose another one.');
         }
+        // check if email is unique
+        $result = $conn->query("select * from user where email='".$email."'");
+        if(!$result)
+        {
+            throw new Exception('Could not execute query');
+        }
+        if($result->num_rows > 0)
+        {
+            throw new Exception('That email is taken - go back and choose another one.');
+        }
         
         // if ok, put in db 
         $result = $conn->query("insert into user values
