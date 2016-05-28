@@ -3,15 +3,20 @@
     require_once('bookmark_fns.php');
     
     // create short variable names 
-    $email = $_POST['email'];
-    $username = $_POST['username'];
-    $passwd = $_POST['passwd'];
-    $passwd2 = $_POST['passwd2'];
-    $enter_vcode = $_POST['veritycode'];
+    $email = $_POST['email'];                   // register time
+    $regtime = time();                          // register time
+    $username = $_POST['username'];             
+    $passwd = $_POST['passwd'];                 // enter_password1
+    $passwd2 = $_POST['passwd2'];               // enter_password2
+    $enter_vcode = $_POST['veriftycode'];       // verifty code
+    $password = md5(trim($_POST['passwd']));    // encryption Password
     // start session which may be needed later
     // start it now because it must go before headers 
     session_start();
     $vcode = $_SESSION['VCODE'];
+    
+    $token = md5($username.$password.$regtime); // create time for activation
+    $token_exptime = time() + 60 * 60 * 24;     // expired after 24 hours
     try
     {
         // check forms filled in 
@@ -49,16 +54,14 @@
         
         // attempt to register 
         // this function can also throw an exception
-        register($username, $email, $passwd);
+        register($username, $email, $passwd, $token, $token_exptime, $regtime);
         // register session variable
         $_SESSION['valid_user'] = $username;
         
         // provide link to members page 
         do_html_header('Registration successful');
         
-        echo 'Your registration was successful. Go to the members page to start 
-            setting up your bookmarks!';
-        do_html_url('member.php', 'Go to members page');
+        echo 'Congratulations, you successfully registered! <br/> Please log in to your mailbox promptly activate your account';
         
         // end page 
         do_html_footer();

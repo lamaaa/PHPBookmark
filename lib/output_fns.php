@@ -145,7 +145,7 @@ function display_registration_form()
 			</tr>
 			<tr>
 				<td><img src="verifycode.php"width="130" height="25"/></td>
-				<td><input type="text" name="veritycode" placeholder="Enter verifycode" size="16" maxlength="6" /></td>
+				<td><input type="text" name="veriftycode" placeholder="Enter verifycode" size="16" maxlength="6" /></td>
 			</tr>
 			<tr>
 				<td colspan="2" align="center">

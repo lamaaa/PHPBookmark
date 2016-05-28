@@ -3,7 +3,7 @@
     require_once('class.phpmailer.php');
     require_once('class.smtp.php');
     
-    function register($username, $email, $password)
+    function register($username, $email, $password, $token, $token_exptime, $regtime)
     {
         // register new person with db 
         // return true or error message
@@ -32,12 +32,18 @@
             throw new Exception('That email is taken - go back and choose another one.');
         }
         
-        // if ok, put in db 
-        $result = $conn->query("insert into user values
-                            ('".$username."', sha1('".$password."'), '".$email."')");
+        // if ok, put in db
+        $sql = "insert into user (username, passwd, email, token, token_exptime, regtime)
+        values ('".$username."', sha1('".$password."'), '".$email."', '".$token."', '".$token_exptime."', '".$regtime."')";
+        
+        $result = $conn->query($sql);
         if(!$result)
         {
             throw new Exception('Could not register you in database - please try again later.');
+        }
+        else
+        {
+            notify_register_mail($username, $token);
         }
         
         return true;
@@ -221,6 +227,50 @@
                 throw new Exception('Could not send email.');
             }
         }
+    }
+    
+    function notify_register_mail($username, $token)
+    {
+        $conn = db_connect();
+        $result = $conn->query("select email from user 
+                                where username = '".$username."'");
+        if(!$result)
+        {
+            throw new Exception('Could not find email address');
+        }
+        else if ($result->num_rows == 0) 
+        {
+            throw new Exception('Could not find email address');
+            // username not in db
+        }
+        else
+        {
+            $row = $result->fetch_object();
+            $email = $row->email;
+
+            $mesg = "Hello! ".$username."：<br/>Thank you for registering a new account at our webmaster<br/>
+                    Please click on the link to activate your account<br/> 
+                    <a href='http://localhost/PHPbookmark/lib/active.php?verify=".$token."' target= 
+                    '_blank'>http://localhost/PHPbookmark/lib/active.php?verify".$token."</a><br/> 
+                    If the above link is not clickable, copy it into your browser address bar and enter access, within the link valid for 24 hours.";
+            
+            $mail  = new PHPMailer();
+            
+            set_mail_para($mail, $username);
+            $mail->Subject    = 'PHPBookmark register information';     // 设置邮件标题
+            $mail->MsgHTML($mesg);                                      // 设置邮件内容
+            $mail->AddAddress($email, $username);
+            
+            if($mail->Send())
+            {
+                return true;
+            }    
+            else 
+            {
+                throw new Exception('Could not send email.');
+            }
+        }
+        
     }
 
 
