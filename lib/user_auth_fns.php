@@ -61,20 +61,54 @@
         // check if username is unique
         $result = $conn->query("select * from user 
                             where username='".$username."'
-                            and passwd = sha1('".$password."')");
+                            and passwd = sha1('".$password."')
+                            and status = 1");
         
         if(!$result)
         {
-            throw new Exception('Invalid password.');
+            throw new Exception('Could not log you in.');
         }
-        
-        if($result->num_rows > 0)
+        else if($result->num_rows == 0)
+        {
+            $result = $conn->query("select * from user 
+                                where username='".$username."'
+                                and passwd = sha1('".$password."')");
+            if(!$result)
+            {
+                throw new Exception('Could not log you in');
+            }
+            
+            if($result->num_rows == 0)
+            {
+                throw new Exception('Invalid username or password.');
+            }
+            
+            else if($result->num_rows > 0)
+            {
+                $row = $result->fetch_object();
+                $regtime = time();
+                $password = md5(trim($password));
+                $token = md5($username.$password.$regtime); // create time for activation
+                $token_exptime = time() + 60 * 60 * 24;     // expired after 24 hours
+                $result = $conn->query("update user
+                                     set token = '".$token."', token_exptime = '".$token_exptime."'
+                                     where username = '".$username."'");
+                if(!$result)
+                {
+                    throw new Exception('You have not verifity your email, and now cannot verifity email.');
+                }
+                else
+                {
+                       notify_register_mail($username, $token);
+                       throw new Exception('Please verifity your email.');
+                }
+            }
+        }
+        else if($result->num_rows > 0)
         {
             return true;
         }
-        else {
-            throw new Exception('Could not log in in.');
-        }
+
     }
 
     function check_valid_user()
